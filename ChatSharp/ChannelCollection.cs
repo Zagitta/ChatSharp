@@ -10,23 +10,24 @@ namespace ChatSharp
     {
         internal ChannelCollection(IrcClient client)
         {
-            Channels = new List<IrcChannel>();
+            Channels = new Dictionary<string, IrcChannel>();
             Client = client;
         }
 
         private IrcClient Client { get; set; }
-        private List<IrcChannel> Channels { get; set; }
+        private Dictionary<string, IrcChannel> Channels { get; set; }
 
         internal void Add(IrcChannel channel)
         {
-            if (Channels.Any(c => c.Name == channel.Name))
+            if (Channels.ContainsKey(channel.Name))
                 throw new InvalidOperationException("That channel already exists in this collection.");
-            Channels.Add(channel);
+
+            Channels.Add(channel.Name, channel);
         }
 
         internal void Remove(IrcChannel channel)
         {
-            Channels.Remove(channel);
+            Channels.Remove(channel.Name);
         }
 
         public void Join(string name)
@@ -36,31 +37,23 @@ namespace ChatSharp
 
         public bool Contains(string name)
         {
-            return Channels.Any(c => c.Name == name);
+            return Channels.ContainsKey(name);
         }
-
-        public IrcChannel this[int index]
-        {
-            get
-            {
-                return Channels[index];
-            }
-        }
-
+        
         public IrcChannel this[string name]
         {
             get
             {
-                var channel = Channels.FirstOrDefault(c => c.Name == name);
-                if (channel == null)
+                if (!Channels.ContainsKey(name))
                     throw new KeyNotFoundException();
-                return channel;
+
+                return Channels[name];
             }
         }
 
         public IEnumerator<IrcChannel> GetEnumerator()
         {
-            return Channels.GetEnumerator();
+            return Channels.Values.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
