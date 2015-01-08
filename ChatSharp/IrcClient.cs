@@ -31,7 +31,7 @@ namespace ChatSharp
             return new DateTime(1970, 1, 1).AddSeconds(time);
         }
 
-        private const int ReadBufferLength = 1024;
+        private const int ReadBufferLength = 4096;
 
         private byte[] ReadBuffer { get; set; }
         private int ReadBufferIndex { get; set; }
